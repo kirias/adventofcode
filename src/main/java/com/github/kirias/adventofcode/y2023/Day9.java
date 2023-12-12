@@ -10,12 +10,7 @@ import java.util.stream.IntStream;
 public class Day9 extends Problem {
 
     public Day9(String path) {
-        super(path);
-    }
-
-    @Override
-    public int getDay() {
-        return 9;
+        super(path, 9);
     }
 
     @Override

@@ -14,12 +14,7 @@ public class Day7 extends Problem {
     private static final int HAND_SIZE = 5;
 
     public Day7(String path) {
-        super(path);
-    }
-
-    @Override
-    public int getDay() {
-        return 7;
+        super(path, 7);
     }
 
     @Override

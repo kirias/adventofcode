@@ -9,16 +9,20 @@ import java.util.stream.Stream;
 public abstract class Problem {
 
     private final String path;
+    private final int day;
 
-    protected Problem(String path) {
+    protected Problem(String path, int day) {
         this.path = path;
+        this.day = day;
     }
-
-    public abstract int getDay();
 
     public abstract long getPart1Solution();
 
     public abstract long getPart2Solution();
+
+    public int getDay() {
+        return day;
+    }
 
     protected Stream<String> inputLines() {
         InputStream inputStream = this.getClass().getResourceAsStream("/inputs" + path);

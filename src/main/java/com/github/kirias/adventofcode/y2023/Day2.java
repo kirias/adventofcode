@@ -9,12 +9,7 @@ public class Day2 extends Problem {
     static final int BLUE_MAX = 14;
 
     public Day2(String path) {
-        super(path);
-    }
-
-    @Override
-    public int getDay() {
-        return 2;
+        super(path, 2);
     }
 
     @Override

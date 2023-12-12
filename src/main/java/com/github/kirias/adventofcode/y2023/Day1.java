@@ -8,12 +8,7 @@ import java.util.regex.Pattern;
 public class Day1 extends Problem {
 
     public Day1(String path) {
-        super(path);
-    }
-
-    @Override
-    public int getDay() {
-        return 1;
+        super(path, 1);
     }
 
     @Override

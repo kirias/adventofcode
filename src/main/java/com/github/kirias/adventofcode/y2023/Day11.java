@@ -11,12 +11,7 @@ import java.util.stream.IntStream;
 public class Day11 extends Problem {
 
     public Day11(String path) {
-        super(path);
-    }
-
-    @Override
-    public int getDay() {
-        return 11;
+        super(path, 11);
     }
 
     @Override
@@ -74,5 +69,6 @@ public class Day11 extends Problem {
         return sum;
     }
 
-    record Universe(int row, int col) {}
+    record Universe(int row, int col) {
+    }
 }
