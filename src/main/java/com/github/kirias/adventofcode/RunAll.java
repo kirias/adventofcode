@@ -11,6 +11,7 @@ public class RunAll {
         Day7 day7 = new Day7("/y2023/Day7.txt");
         Day9 day9 = new Day9("/y2023/Day9.txt");
         Day11 day11 = new Day11("/y2023/Day11.txt");
+        Day12 day12 = new Day12("/y2023/Day12.txt");
 
         printSolution(day1); // 54644 53348
         printSolution(day2); // 2239 83435
@@ -18,6 +19,7 @@ public class RunAll {
         printSolution(day7); // 248179786 247885995
         printSolution(day9); // 1884768153 1031
         printSolution(day11); // 10494813 840988812853
+        printSolution(day12); // 8270
     }
 
     static void printSolution(Problem problem) {
