@@ -19,7 +19,7 @@ public class RunAll {
         printSolution(day7); // 248179786 247885995
         printSolution(day9); // 1884768153 1031
         printSolution(day11); // 10494813 840988812853
-        printSolution(day12); // 8270
+        printSolution(day12); // 8270 204640299929836
     }
 
     static void printSolution(Problem problem) {
