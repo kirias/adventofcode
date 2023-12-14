@@ -2,6 +2,7 @@ package com.github.kirias.adventofcode.y2023;
 
 import com.github.kirias.adventofcode.Problem;
 
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class Day14 extends Problem {
         return weight;
     }
 
-    Map<List<Long>, Long> prevCycles = new HashMap<>();
+    Map<List<BitSet>, Long> prevCycles = new HashMap<>();
 
     enum Rock {
         ROUND, EDGE, EMPTY
@@ -70,7 +71,7 @@ public class Day14 extends Problem {
                 tiltToRight(rocks.get(i));
             }
 
-            List<Long> rockPositions = rocksToLong(rocks);
+            List<BitSet> rockPositions = bitMasks(rocks);
             if (prevCycles.containsKey(rockPositions)) {
                 long prevCycle = prevCycles.get(rockPositions);
                 long diff = cycle - prevCycle;
@@ -103,17 +104,17 @@ public class Day14 extends Problem {
         return weight;
     }
 
-    private List<Long> rocksToLong(List<List<Rock>> rocks) {
+    private List<BitSet> bitMasks(List<List<Rock>> rocks) {
         return rocks.stream()
-                .map(this::toLong)
+                .map(this::bitMask)
                 .collect(Collectors.toList());
     }
 
-    private Long toLong(List<Rock> rock) {
-        long bitMask = 0;
+    private BitSet bitMask(List<Rock> rock) {
+        BitSet bitMask = new BitSet();
         for (int i = 0; i < rock.size(); i++) {
             if (rock.get(i) == Rock.ROUND) {
-                bitMask = bitMask | (1L << i);
+                bitMask.set(i);
             }
         }
         return bitMask;
