@@ -9,11 +9,11 @@ import java.util.TreeSet;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-public class Day7 extends Problem {
+public class Day07 extends Problem {
 
     private static final int HAND_SIZE = 5;
 
-    public Day7(String path) {
+    public Day07(String path) {
         super(path, 7);
     }
 

@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Day5 extends Problem {
+public class Day05 extends Problem {
 
     record Mapper(long dest, long source, long len) {
 
@@ -72,7 +72,7 @@ public class Day5 extends Problem {
         }
     }
 
-    public Day5(String path) {
+    public Day05(String path) {
         super(path, 5);
     }
 

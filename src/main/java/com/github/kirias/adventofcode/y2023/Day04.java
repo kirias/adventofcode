@@ -7,9 +7,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Day4 extends Problem {
+public class Day04 extends Problem {
 
-    public Day4(String path) {
+    public Day04(String path) {
         super(path, 4);
     }
 

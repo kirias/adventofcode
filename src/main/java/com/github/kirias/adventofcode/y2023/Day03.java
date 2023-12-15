@@ -5,9 +5,9 @@ import com.github.kirias.adventofcode.common.LongPair;
 
 import java.util.*;
 
-public class Day3 extends Problem {
+public class Day03 extends Problem {
 
-    public Day3(String path) {
+    public Day03(String path) {
         super(path, 3);
     }
 

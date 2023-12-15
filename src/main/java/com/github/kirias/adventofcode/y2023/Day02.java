@@ -2,13 +2,13 @@ package com.github.kirias.adventofcode.y2023;
 
 import com.github.kirias.adventofcode.Problem;
 
-public class Day2 extends Problem {
+public class Day02 extends Problem {
 
     static final int RED_MAX = 12;
     static final int GREEN_MAX = 13;
     static final int BLUE_MAX = 14;
 
-    public Day2(String path) {
+    public Day02(String path) {
         super(path, 2);
     }
 

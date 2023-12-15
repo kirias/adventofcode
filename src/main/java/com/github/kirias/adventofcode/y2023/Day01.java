@@ -5,9 +5,9 @@ import com.github.kirias.adventofcode.Problem;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Day1 extends Problem {
+public class Day01 extends Problem {
 
-    public Day1(String path) {
+    public Day01(String path) {
         super(path, 1);
     }
 

@@ -7,9 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class Day9 extends Problem {
+public class Day09 extends Problem {
 
-    public Day9(String path) {
+    public Day09(String path) {
         super(path, 9);
     }
 
