@@ -39,7 +39,12 @@ public class RunAll {
     }
 
     static void printSolution(Problem problem) {
-        System.out.printf("Day %d part 1 solution: %d%n", problem.getDay(), problem.getPart1Solution());
-        System.out.printf("Day %d part 2 solution: %d%n", problem.getDay(), problem.getPart2Solution());
+        long startTime = System.currentTimeMillis();
+        long part1Solution = problem.getPart1Solution();
+        long p1Time = System.currentTimeMillis();
+        long part2Solution = problem.getPart2Solution();
+        long endTime = System.currentTimeMillis();
+        System.out.printf("Day %d part 1 solution: %d, took %5.3f sec%n", problem.getDay(), part1Solution, (p1Time - startTime) / 1000f);
+        System.out.printf("Day %d part 2 solution: %d, took %5.3f sec%n", problem.getDay(), part2Solution, (endTime - p1Time) / 1000f);
     }
 }
