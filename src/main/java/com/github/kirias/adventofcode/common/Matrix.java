@@ -1,10 +1,13 @@
 package com.github.kirias.adventofcode.common;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Matrix<E> {
 
@@ -39,6 +42,10 @@ public class Matrix<E> {
 
     public E get(int row, int col) {
         return inMatrix(row, col) ? rows.get(row).get(col) : null;
+    }
+
+    public Optional<E> getIfExist(int row, int col) {
+        return inMatrix(row, col) ? Optional.of(rows.get(row).get(col)) : Optional.empty();
     }
 
     public List<E> getList(int row, int col) {
@@ -79,5 +86,18 @@ public class Matrix<E> {
         if (row < 0 || col < 0) return false;
         if (row >= height() || col >= width()) return false;
         return true;
+    }
+
+    public Stream<E> stream() {
+        return rows.stream().flatMap(Collection::stream);
+    }
+
+    public void print() {
+        for (List<E> row : rows) {
+            for (E el : row) {
+                System.out.print(el);
+            }
+            System.out.println();
+        }
     }
 }

@@ -1,14 +1,17 @@
 package com.github.kirias.adventofcode.common;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public enum Direction {
-    LEFT(-1, 0), RIGHT(1, 0), UP(0, -1), DOWN(0, 1);
+    LEFT(0, -1), RIGHT(0, 1), UP(-1, 0), DOWN(1, 0);
 
     final int colOffset;
     final int rowOffset;
 
-    Direction(int colOffset, int rowOffset) {
-        this.colOffset = colOffset;
+    Direction(int rowOffset, int colOffset) {
         this.rowOffset = rowOffset;
+        this.colOffset = colOffset;
     }
 
     public int colOffset() {
@@ -35,5 +38,9 @@ public enum Direction {
 
     public Direction turnRight() {
         return turnLeft().opposite();
+    }
+
+    public static Set<Direction> all() {
+        return EnumSet.allOf(Direction.class);
     }
 }
