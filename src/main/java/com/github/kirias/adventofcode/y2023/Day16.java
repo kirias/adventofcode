@@ -1,172 +1,80 @@
 package com.github.kirias.adventofcode.y2023;
 
 import com.github.kirias.adventofcode.Problem;
+import com.github.kirias.adventofcode.common.Direction;
 import com.github.kirias.adventofcode.common.Matrix;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.function.Consumer;
 
-public class Day16 extends Problem {
+import static com.github.kirias.adventofcode.common.Direction.*;
 
-    enum GridType {
-        EMPTY, MIRROR, SPLITTER
-    }
+public class Day16 extends Problem {
 
     static class GridEl {
         private final int row;
         private final int col;
-        private final GridType type;
         private final char el;
 
-        boolean beamLeft, beamRight, beamUp, beamDown;
+        Set<Direction> lights = EnumSet.noneOf(Direction.class);
 
         public GridEl(char s, int row, int col) {
             this.row = row;
             this.col = col;
             this.el = s;
-            type = switch (s) {
-                case '.' -> GridType.EMPTY;
-                case '/' -> GridType.MIRROR;
-                case '\\' -> GridType.MIRROR;
-                case '|' -> GridType.SPLITTER;
-                case '-' -> GridType.SPLITTER;
-                default -> throw new IllegalStateException("Unexpected value: " + s);
-            };
         }
 
-        public void lightLeftDir(Matrix<GridEl> matrix, Consumer<GridEl> ifLighted) {
-            if (type == GridType.MIRROR) {
+        public void lightNextEls(Matrix<GridEl> matrix, Direction direction, Consumer<GridEl> ifLighted) {
+            if (el == '/' || el == '\\') {
+                Direction mirrorReflection = switch (direction) {
+                    case LEFT -> DOWN;
+                    case RIGHT -> UP;
+                    case UP -> RIGHT;
+                    default -> LEFT;
+                };
+                final Direction finalDirection;
                 if (el == '/') {
-                    matrix.apply(row + 1, col, el -> el.lightDown(ifLighted));
+                    finalDirection = mirrorReflection;
                 } else {
-                    matrix.apply(row - 1, col, el -> el.lightUp(ifLighted));
+                    finalDirection = mirrorReflection.opposite();
                 }
-            } else if (type == GridType.EMPTY) {
-                matrix.apply(row, col - 1, el -> el.lightLeft(ifLighted));
-            } else if (type == GridType.SPLITTER) {
-                if (el == '|') {
-                    matrix.apply(row - 1, col, el -> el.lightUp(ifLighted));
-                    matrix.apply(row + 1, col, el -> el.lightDown(ifLighted));
+                matrix.apply(row + finalDirection.rowOffset(), col + finalDirection.colOffset(), el -> el.tryLight(finalDirection, ifLighted));
+            } else if (el == '.') {
+                matrix.apply(row + direction.rowOffset(), col + direction.colOffset(), el -> el.tryLight(direction, ifLighted));
+            } else if (el == '|' || el == '-') {
+                if ((el == '|' && (direction == UP || direction == DOWN)) ||
+                        (el == '-' && (direction == LEFT || direction == RIGHT))) {
+                    matrix.apply(row + direction.rowOffset(), col + direction.colOffset(), el -> el.tryLight(direction, ifLighted));
                 } else {
-                    matrix.apply(row, col - 1, el -> el.lightLeft(ifLighted));
+                    Direction left = direction.turnLeft();
+                    Direction right = direction.turnRight();
+                    matrix.apply(row + left.rowOffset(), col + left.colOffset(), el -> el.tryLight(left, ifLighted));
+                    matrix.apply(row + right.rowOffset(), col + right.colOffset(), el -> el.tryLight(right, ifLighted));
                 }
             }
         }
 
-        public void lightRightDir(Matrix<GridEl> matrix, Consumer<GridEl> ifLighted) {
-            if (type == GridType.MIRROR) {
-                if (el == '/') {
-                    matrix.apply(row - 1, col, el -> el.lightUp(ifLighted));
-                } else {
-                    matrix.apply(row + 1, col, el -> el.lightDown(ifLighted));
-                }
-            } else if (type == GridType.EMPTY) {
-                matrix.apply(row, col + 1, el -> el.lightRight(ifLighted));
-            } else if (type == GridType.SPLITTER) {
-                if (el == '|') {
-                    matrix.apply(row - 1, col, el -> el.lightUp(ifLighted));
-                    matrix.apply(row + 1, col, el -> el.lightDown(ifLighted));
-                } else {
-                    matrix.apply(row, col + 1, el -> el.lightRight(ifLighted));
-                }
-            }
+        public boolean anyLight() {
+            return !lights.isEmpty();
         }
 
-        public void lightUpDir(Matrix<GridEl> matrix, Consumer<GridEl> ifLighted) {
-            if (type == GridType.MIRROR) {
-                if (el == '/') {
-                    matrix.apply(row, col + 1, el -> el.lightRight(ifLighted));
-                } else {
-                    matrix.apply(row, col - 1, el -> el.lightLeft(ifLighted));
-                }
-            } else if (type == GridType.EMPTY) {
-                matrix.apply(row - 1, col, el -> el.lightUp(ifLighted));
-            } else if (type == GridType.SPLITTER) {
-                if (el == '-') {
-                    matrix.apply(row, col - 1, el -> el.lightLeft(ifLighted));
-                    matrix.apply(row, col + 1, el -> el.lightRight(ifLighted));
-                } else {
-                    matrix.apply(row - 1, col, el -> el.lightUp(ifLighted));
-                }
-            }
-        }
-
-        public void lightDownDir(Matrix<GridEl> matrix, Consumer<GridEl> ifLighted) {
-            if (type == GridType.MIRROR) {
-                if (el == '/') {
-                    matrix.apply(row, col - 1, el -> el.lightLeft(ifLighted));
-                } else {
-                    matrix.apply(row, col + 1, el -> el.lightRight(ifLighted));
-                }
-            } else if (type == GridType.EMPTY) {
-                matrix.apply(row + 1, col, el -> el.lightDown(ifLighted));
-            } else if (type == GridType.SPLITTER) {
-                if (el == '-') {
-                    matrix.apply(row, col - 1, el -> el.lightLeft(ifLighted));
-                    matrix.apply(row, col + 1, el -> el.lightRight(ifLighted));
-                } else {
-                    matrix.apply(row + 1, col, el -> el.lightDown(ifLighted));
-                }
-            }
-        }
-
-
-        public boolean anyBeam() {
-            return beamRight || beamLeft || beamUp || beamDown;
-        }
-
-        public void setBeamLeft() {
-            this.beamLeft = true;
-        }
-
-        public void lightLeft(Consumer<GridEl> ifLighted) {
-            if (!beamLeft) {
-                beamLeft = true;
+        public void tryLight(Direction lightDirection, Consumer<GridEl> ifLighted) {
+            if (!lights.contains(lightDirection)) {
+                lights.add(lightDirection);
                 ifLighted.accept(this);
             }
         }
 
-        public void lightRight(Consumer<GridEl> ifLighted) {
-            if (!beamRight) {
-                beamRight = true;
-                ifLighted.accept(this);
-            }
+        public void setLight(Direction lightDirection) {
+            lights.add(lightDirection);
         }
 
-        public void lightUp(Consumer<GridEl> ifLighted) {
-            if (!beamUp) {
-                beamUp = true;
-                ifLighted.accept(this);
-            }
+        public void resetLights() {
+            lights.clear();
         }
 
-        public void lightDown(Consumer<GridEl> ifLighted) {
-            if (!beamDown) {
-                beamDown = true;
-                ifLighted.accept(this);
-            }
-        }
-
-        public void setBeamRight() {
-            this.beamRight = true;
-        }
-
-        public void setBeamUp() {
-            this.beamUp = true;
-        }
-
-        public void setBeamDown() {
-            this.beamDown = true;
-        }
-
-        public void resetBeams() {
-            beamRight = false;
-            beamLeft = false;
-            beamUp = false;
-            beamDown = false;
+        public void forEachLight(Consumer<Direction> directionConsumer) {
+            lights.forEach(directionConsumer);
         }
     }
 
@@ -178,7 +86,7 @@ public class Day16 extends Problem {
     public long getPart1Solution() {
         Matrix<GridEl> matrix = getInputMatrix();
 
-        matrix.get(0, 0).setBeamRight();
+        matrix.get(0, 0).setLight(RIGHT);
         return countEnergized(matrix, 0, 0);
     }
 
@@ -188,22 +96,18 @@ public class Day16 extends Problem {
 
         long maxEnergized = 0;
         for (int row = 0; row < matrix.height(); row++) {
-            matrix.get(row, 0).setBeamRight();
+            matrix.get(row, 0).setLight(RIGHT);
             maxEnergized = Math.max(maxEnergized, countEnergized(matrix, row, 0));
-            matrix.forEach(GridEl::resetBeams);
 
-            matrix.get(row, matrix.width() - 1).setBeamLeft();
+            matrix.get(row, matrix.width() - 1).setLight(LEFT);
             maxEnergized = Math.max(maxEnergized, countEnergized(matrix, row, matrix.width() - 1));
-            matrix.forEach(GridEl::resetBeams);
         }
         for (int col = 0; col < matrix.width(); col++) {
-            matrix.get(0, col).setBeamDown();
+            matrix.get(0, col).setLight(DOWN);
             maxEnergized = Math.max(maxEnergized, countEnergized(matrix, 0, col));
-            matrix.forEach(GridEl::resetBeams);
 
-            matrix.get(matrix.height() - 1, col).setBeamUp();
+            matrix.get(matrix.height() - 1, col).setLight(UP);
             maxEnergized = Math.max(maxEnergized, countEnergized(matrix, matrix.height() - 1, col));
-            matrix.forEach(GridEl::resetBeams);
         }
 
         return maxEnergized;
@@ -232,20 +136,10 @@ public class Day16 extends Problem {
 
         while (!elements.isEmpty()) {
             GridEl beam = elements.poll();
-            if (beam.beamLeft) {
-                beam.lightLeftDir(matrix, elements::add);
-            }
-            if (beam.beamRight) {
-                beam.lightRightDir(matrix, elements::add);
-            }
-            if (beam.beamUp) {
-                beam.lightUpDir(matrix, elements::add);
-            }
-            if (beam.beamDown) {
-                beam.lightDownDir(matrix, elements::add);
-            }
+            beam.forEachLight(dir -> beam.lightNextEls(matrix, dir, elements::add));
         }
-
-        return matrix.count(GridEl::anyBeam);
+        long countLights = matrix.count(GridEl::anyLight);
+        matrix.forEach(GridEl::resetLights);
+        return countLights;
     }
 }
