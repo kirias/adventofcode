@@ -6,6 +6,7 @@ import com.github.kirias.adventofcode.common.Matrix;
 import com.github.kirias.adventofcode.common.Pair;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Day17 extends Problem {
@@ -13,18 +14,10 @@ public class Day17 extends Problem {
     record Block(int row, int col, int loss) {
     }
 
-    record Visits(int row, int col, Direction dir, int stepsInDir) {
+    record Visits(int row, int col, Direction dir) {
     }
 
-    static final class PathFactory {
-        private final int maxAllowed;
-        private final int minAllowed;
-
-        public PathFactory(int maxAllowed, int minAllowed) {
-            this.maxAllowed = maxAllowed;
-            this.minAllowed = minAllowed;
-        }
-
+    record PathFactory(int minAllowed, int maxAllowed) {
         public Path createPath(Path prev, Block block, Direction direction) {
             return new Path(maxAllowed, minAllowed, prev, block, direction);
         }
@@ -92,34 +85,12 @@ public class Day17 extends Problem {
                     '}';
         }
 
-        Set<Direction> allowedNextSteps() {
-            if (prev == null || direction == null) return Direction.all();
-            if (minAllowed == 0) return exceptStepBack(Direction.all());
-            Path check = this;
-            for (int i = 0; i < minAllowed; i++) {
-                if (check == null || check.direction != direction) return Set.of(direction);
-                check = check.prev;
-            }
-            return exceptStepBack(Direction.all());
-        }
+        Set<Pair<Direction, Integer>> allowedNextSteps() {
+            return (direction == null ? Direction.all() : Set.of(direction.turnRight(), direction.turnLeft()))
+                    .stream()
+                    .flatMap(direction -> IntStream.range(minAllowed, maxAllowed + 1)
+                            .mapToObj(i -> new Pair<>(direction, i))).collect(Collectors.toSet());
 
-        private Set<Direction> exceptStepBack(Set<Direction> allowedDirections) {
-            allowedDirections.remove(direction.opposite());
-            return allowedDirections;
-        }
-
-        int countDirectionAllowed(Direction checkDirection) {
-            int allowed = maxAllowed;
-            Path currentCheck = this;
-            while (currentCheck != null && allowed > 0) {
-                if (currentCheck.direction == checkDirection) {
-                    allowed--;
-                    currentCheck = currentCheck.prev;
-                } else {
-                    break;
-                }
-            }
-            return allowed;
         }
     }
 
@@ -129,13 +100,13 @@ public class Day17 extends Problem {
 
     @Override
     public long getPart1Solution() {
-        PathFactory pathFactory = new PathFactory(3, 0);
+        PathFactory pathFactory = new PathFactory(1, 3);
         return getSolution(pathFactory);
     }
 
     @Override
     public long getPart2Solution() {
-        PathFactory pathFactory = new PathFactory(10, 4);
+        PathFactory pathFactory = new PathFactory(4, 10);
         return getSolution(pathFactory);
     }
 
@@ -161,7 +132,6 @@ public class Day17 extends Problem {
         Map<Visits, Integer> explored = new HashMap<>();
         queue.add(start);
 
-
         while (!queue.isEmpty()) {
             Path shortestPath = queue.poll();
             if (shortestPath.block == end) {
@@ -170,23 +140,31 @@ public class Day17 extends Problem {
             }
 
             shortestPath.allowedNextSteps()
-                    .forEach(direction -> {
-                        int directionAllowed = shortestPath.countDirectionAllowed(direction);
-                        if (directionAllowed > 0) {
-                            matrix.getIfExist(shortestPath.block.row + direction.rowOffset(), shortestPath.block.col + direction.colOffset())
-                                    .map(b -> pathFactory.createPath(shortestPath, b, direction))
-                                    .flatMap(path -> {
-                                        Visits v = new Visits(path.block.row, path.block.col, direction, directionAllowed);
-                                        int pathLoss = path.getLoss();
-                                        if (explored.containsKey(v) && explored.get(v) <= pathLoss) {
-                                            return Optional.empty();
-                                        } else {
-                                            explored.put(v, pathLoss);
-                                            return Optional.of(path);
-                                        }
-                                    })
-                                    .ifPresent(queue::add);
-                        }
+                    .forEach(step -> {
+                        Direction direction = step.getLeft();
+                        Integer steps = step.getRight();
+                        matrix.getIfExist(shortestPath.block.row + direction.rowOffset() * steps, shortestPath.block.col + direction.colOffset() * steps)
+                                .map(b -> {
+                                    Path current = shortestPath;
+                                    for (int i = 0; i < steps; i++) {
+                                        current = pathFactory.createPath(current,
+                                                matrix.get(current.block.row + direction.rowOffset(), current.block.col + direction.colOffset()),
+                                                direction);
+                                    }
+                                    return current;
+                                })
+                                .flatMap(path -> {
+                                    Visits v = new Visits(path.block.row, path.block.col, direction);
+                                    int pathLoss = path.getLoss();
+                                    if (explored.containsKey(v) && explored.get(v) <= pathLoss) {
+                                        return Optional.empty();
+                                    } else {
+                                        explored.put(v, pathLoss);
+                                        return Optional.of(path);
+                                    }
+                                })
+                                .ifPresent(queue::add);
+
                     });
         }
         return result.getLoss() - matrix.get(0, 0).loss;
