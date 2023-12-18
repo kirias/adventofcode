@@ -20,7 +20,15 @@ public class Matrix<E> {
     public Matrix(int rows, int cols) {
         this.rows = new ArrayList<>(rows);
         IntStream.range(0, rows)
-                .forEach(i -> this.rows.add(new ArrayList<>(cols)));
+                .forEach(i -> this.rows.add(emptyArray(cols)));
+    }
+
+    private static <E> ArrayList<E> emptyArray(int cols) {
+        ArrayList<E> row = new ArrayList<>(cols);
+        for (int i = 0; i < cols; i++) {
+            row.add(null);
+        }
+        return row;
     }
 
     public Matrix() {
@@ -69,9 +77,7 @@ public class Matrix<E> {
 
     public void forEach(Consumer<E> consumer) {
         for (List<E> row : rows) {
-            for (E el : row) {
-                consumer.accept(el);
-            }
+            row.forEach(consumer);
         }
     }
 
@@ -95,7 +101,11 @@ public class Matrix<E> {
     public void print() {
         for (List<E> row : rows) {
             for (E el : row) {
-                System.out.print(el);
+                if (el != null) {
+                    System.out.print(el);
+                } else {
+                    System.out.print(" ");
+                }
             }
             System.out.println();
         }
