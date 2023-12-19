@@ -1,6 +1,7 @@
 package com.github.kirias.adventofcode.common;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import static java.math.BigInteger.valueOf;
 
@@ -28,5 +29,14 @@ public class MathUtil {
             lcm = lcm(lcm, number);
         }
         return lcm;
+    }
+
+    public static long gcd(List<Integer> values) {
+        long gcd = gcd(values.get(0), values.get(1));
+        for (int i = 2; i < values.size(); i++) {
+            long number = values.get(i);
+            gcd = gcd(gcd, number);
+        }
+        return gcd;
     }
 }
