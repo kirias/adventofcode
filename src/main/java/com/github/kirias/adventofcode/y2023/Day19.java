@@ -37,7 +37,7 @@ public class Day19 extends Problem {
                 String target = workflow.calcTarget(part);
                 if (target.equals("R")) break;
                 if (target.equals("A")) {
-                    sum += part.x + part.m + part.a + part.s;
+                    sum += part.categories[0] + part.categories[1] + part.categories[2] + part.categories[3];
                     break;
                 }
                 workflow = workflows.get(target);
@@ -98,28 +98,31 @@ public class Day19 extends Problem {
         }
 
         public String getTarget(Part part) {
-            long fieldVal = switch (field) {
-                case "x" -> part.x;
-                case "m" -> part.m;
-                case "a" -> part.a;
-                default -> part.s;
-            };
             if (gt) {
-                if (fieldVal > value) return target;
+                if (part.categories[getFieldOffset()] > value) return target;
             } else {
-                if (fieldVal < value) return target;
+                if (part.categories[getFieldOffset()] < value) return target;
             }
             return null;
         }
 
         public Pair<PartRange, PartRange> split(PartRange partRange) {
             if (!gt) {
-                Pair<PartRange, PartRange> matched_unmatched = partRange.splitBy(field, value);
+                Pair<PartRange, PartRange> matched_unmatched = partRange.splitBy(getFieldOffset(), value);
                 return matched_unmatched;
             } else {
-                Pair<PartRange, PartRange> unmatched_matched = partRange.splitBy(field, value + 1);
+                Pair<PartRange, PartRange> unmatched_matched = partRange.splitBy(getFieldOffset(), value + 1);
                 return new Pair<>(unmatched_matched.getRight(), unmatched_matched.getLeft());
             }
+        }
+
+        private int getFieldOffset() {
+            return switch (field) {
+                case "x" -> 0;
+                case "m" -> 1;
+                case "a" -> 2;
+                default -> 3;
+            };
         }
     }
 
@@ -168,48 +171,35 @@ public class Day19 extends Problem {
 
     static class Part {
 
-        long x, m, a, s;
+        long[] categories = new long[4];
 
         public Part(String line) {
             Pattern pattern = Pattern.compile("\\{x=(\\d+),m=(\\d+),a=(\\d+),s=(\\d+)}");
             Matcher matcher = pattern.matcher(line);
             matcher.find();
-            x = Long.parseLong(matcher.group(1));
-            m = Long.parseLong(matcher.group(2));
-            a = Long.parseLong(matcher.group(3));
-            s = Long.parseLong(matcher.group(4));
+            categories[0] = Long.parseLong(matcher.group(1));
+            categories[1] = Long.parseLong(matcher.group(2));
+            categories[2] = Long.parseLong(matcher.group(3));
+            categories[3] = Long.parseLong(matcher.group(4));
         }
     }
 
     static class PartRange {
 
-        Map<String, Long> fields;
+        long[] categoryMins = {1, 1, 1, 1};
+        long[] categoryMaxs = {4000, 4000, 4000, 4000};
 
-        public PartRange(Map<String, Long> fields) {
-            this.fields = new HashMap<>(fields);
+        public PartRange(long[] categoryMins, long[] categoryMaxs) {
+            this.categoryMins = Arrays.copyOf(categoryMins, categoryMins.length);
+            this.categoryMaxs = Arrays.copyOf(categoryMaxs, categoryMaxs.length);
         }
 
         public PartRange() {
-            // @formatter:off
-            this.fields = new HashMap<>(Map.of(
-                    "xmin", 1L,
-                    "xmax", 4000L,
-                    "mmin", 1L,
-                    "mmax", 4000L,
-                    "amin", 1L,
-                    "amax", 4000L,
-                    "smin", 1L,
-                    "smax", 4000L
-            ));
-            // @formatter:on
         }
 
-        public Pair<PartRange, PartRange> splitBy(String field, long rightInclusive) {
-            String minAcceptedKey = field + "min";
-            String maxAcceptedKey = field + "max";
-
-            long minAccepted = fields.get(minAcceptedKey);
-            long maxAccepted = fields.get(maxAcceptedKey);
+        public Pair<PartRange, PartRange> splitBy(int field, long rightInclusive) {
+            long minAccepted = categoryMins[field];
+            long maxAccepted = categoryMaxs[field];
 
             if (rightInclusive > maxAccepted) {
                 return new Pair<>(this, null);
@@ -219,17 +209,20 @@ public class Day19 extends Problem {
             }
             PartRange left = copy();
             PartRange right = copy();
-            left.fields.put(maxAcceptedKey, rightInclusive - 1);
-            right.fields.put(minAcceptedKey, rightInclusive);
+            left.categoryMaxs[field] = rightInclusive - 1;
+            right.categoryMins[field] = rightInclusive;
             return new Pair<>(left, right);
         }
 
         private PartRange copy() {
-            return new PartRange(fields);
+            return new PartRange(categoryMins, categoryMaxs);
         }
 
         public long rangeCount() {
-            return (fields.get("xmax") - fields.get("xmin") + 1) * (fields.get("mmax") - fields.get("mmin") + 1) * (fields.get("amax") - fields.get("amin") + 1) * (fields.get("smax") - fields.get("smin") + 1);
+            return (categoryMaxs[0] - categoryMins[0] + 1) *
+                    (categoryMaxs[1] - categoryMins[1] + 1) *
+                    (categoryMaxs[2] - categoryMins[2] + 1) *
+                    (categoryMaxs[3] - categoryMins[3] + 1);
         }
     }
 
