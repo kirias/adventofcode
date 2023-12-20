@@ -39,4 +39,13 @@ public class MathUtil {
         }
         return gcd;
     }
+
+    public static long lcm(List<Long> values) {
+        long lcm = lcm(values.get(0), values.get(1));
+        for (int i = 2; i < values.size(); i++) {
+            long number = values.get(i);
+            lcm = lcm(lcm, number);
+        }
+        return lcm;
+    }
 }

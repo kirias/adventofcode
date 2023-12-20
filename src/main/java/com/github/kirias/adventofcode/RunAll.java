@@ -24,6 +24,7 @@ public class RunAll {
         Day17 day17 = new Day17("/y2023/Day17.txt");
         Day18 day18 = new Day18("/y2023/Day18.txt");
         Day19 day19 = new Day19("/y2023/Day19.txt");
+        Day20 day20 = new Day20("/y2023/Day20.txt");
 
         printSolution(day01); // 54644 53348
         printSolution(day02); // 2239 83435
@@ -44,6 +45,7 @@ public class RunAll {
         printSolution(day17); // 1260 1416
         printSolution(day18); // 41019 96116995735219
         printSolution(day19); // 319295 110807725108076
+        printSolution(day20); // 747304011 220366255099387
     }
 
     static void printSolution(Problem problem) {
