@@ -110,4 +110,8 @@ public class Matrix<E> {
             System.out.println();
         }
     }
+
+    public List<List<E>> rows() {
+        return rows;
+    }
 }
