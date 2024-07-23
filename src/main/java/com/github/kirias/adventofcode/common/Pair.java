@@ -12,6 +12,10 @@ public class Pair<L, R> {
         this.right = right;
     }
 
+    public Pair<L, R> swap() {
+        return new Pair<>((L)right, (R)left);
+    }
+
     public L getLeft() {
         return left;
     }
@@ -26,6 +30,14 @@ public class Pair<L, R> {
         if (o == null || getClass() != o.getClass()) return false;
         Pair<?, ?> pair = (Pair<?, ?>) o;
         return Objects.equals(left, pair.left) && Objects.equals(right, pair.right);
+    }
+
+    @Override
+    public String toString() {
+        return "Pair{" +
+                "left=" + left +
+                ", right=" + right +
+                '}';
     }
 
     @Override

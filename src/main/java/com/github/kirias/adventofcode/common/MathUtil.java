@@ -31,7 +31,7 @@ public class MathUtil {
         return lcm;
     }
 
-    public static long gcd(List<Integer> values) {
+    public static long gcd(List<Long> values) {
         long gcd = gcd(values.get(0), values.get(1));
         for (int i = 2; i < values.size(); i++) {
             long number = values.get(i);
